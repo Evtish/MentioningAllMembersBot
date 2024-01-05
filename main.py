@@ -31,7 +31,7 @@ async def info(client, message):
 
 
 @bot.on_message(filters.command('skibidi'))
-async def info(client, message):
+async def skibidi(client, message):
     await bot.send_message(message.chat.id, 'брр скибиди доп доп доп ес ес')
 
 
