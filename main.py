@@ -19,7 +19,17 @@ async def get_all_members(client, message):
             if not member.user.is_bot and curr_username != sender_username:
                 members.append('@' + curr_username)
 
-        await bot.send_message(chat_id, ' '.join(members), reply_to_message_id=message.reply_to_message_id)
+        stop_printing = False
+        while not stop_printing:
+            printing_members = ''
+            while members and len(printing_members) + len(members[0]) + 1 < 4096:
+                printing_members += members[0] + ' '
+                del members[0]
+
+            if not members:
+                stop_printing = True
+
+            await bot.send_message(chat_id, printing_members, reply_to_message_id=message.reply_to_message_id)
 
     else:
         await bot.send_message(message.chat.id, 'Эта команда предназначена только для групп')
