@@ -9,8 +9,8 @@ from pyrogram import Client, filters, enums
      'password': 'password'
 }
 
-bot = Client('mentioning_all_members', proxy=proxy)'''
-bot = Client('mentioning_all_members')
+bot = Client('mentioning_all_members_bot', proxy=proxy)'''
+bot = Client('mentioning_all_members_bot')
 
 with open('info.txt', encoding='utf-8') as info_file:
     info_text = info_file.read()
@@ -21,26 +21,37 @@ async def get_all_members(client, message):
     if message.chat.type == enums.ChatType.GROUP or message.chat.type == enums.ChatType.SUPERGROUP:
         members = []
         chat_id = message.chat.id
-        sender_username = message.from_user.username
+
+        '''
+        printing_members = []
+        is_printed = False
+        async for member in bot.get_chat_members(chat_id):
+            curr_username = member.user.username
+            if curr_username and not member.user.is_bot and curr_username != message.from_user.username:
+                if len(' '.join(printing_members)) + len(curr_username) + 2 <= 4096:
+                    printing_members.append('@' + curr_username)
+                else:
+                    await bot.send_message(chat_id, ' '.join(printing_members), reply_to_message_id=message.reply_to_message_id)
+                    printing_members = []
+                    is_printed = True
+        if not is_printed:
+            await bot.send_message(chat_id, ' '.join(printing_members), reply_to_message_id=message.reply_to_message_id)
+        '''
 
         async for member in bot.get_chat_members(chat_id):
             curr_username = member.user.username
-            if curr_username and not member.user.is_bot and curr_username != sender_username:
+            if curr_username and not member.user.is_bot and curr_username != message.from_user.username:
                 members.append('@' + str(curr_username))
 
-        stop_printing = False
-        while not stop_printing:
-            printing_members = ''
+        while True:
+            printing_members = []
             while members and len(printing_members) + len(members[0]) + 1 < 4096:
-                printing_members += members[0] + ' '
-                del members[0]
+                printing_members.append(members.pop())
+
+            await bot.send_message(chat_id, ' '.join(printing_members), reply_to_message_id=message.reply_to_message_id)
 
             if not members:
-                stop_printing = True
-
-            await bot.send_message(chat_id, printing_members, reply_to_message_id=message.reply_to_message_id)
-        '''for name in members:
-            await bot.send_message(chat_id, name, reply_to_message_id=message.reply_to_message_id)'''
+                break
 
     else:
         await bot.send_message(message.chat.id, 'Эта команда предназначена только для групп')

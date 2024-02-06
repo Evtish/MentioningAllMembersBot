@@ -1,10 +1,13 @@
-members = ['@drus_s', '@Dostatochno_geniy']
-stop_printing = False
-while not stop_printing:
-    printing_members = ''
-    while members and len(printing_members) + len(members[0]) + 1 < 4096:
-        printing_members += members[0] + ' '
-        del members[0]
-    if not members:
-        stop_printing = True
+members = ['drus_s', 'Dostatochno_geniy']
+printing_members = []
+is_printed = False
+for member in members:
+    if member:
+        if len(' '.join(printing_members)) + len(member) + 2 <= 4096:
+            printing_members.append('@' + member)
+        else:
+            print(' '.join(printing_members))
+            printing_members = []
+            is_printed = True
+if not is_printed:
     print(printing_members)
